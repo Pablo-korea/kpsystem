@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}KP시스템 차트 생성기 - 소개{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold text-primary mb-3">
+                    <i class="fas fa-info-circle"></i> KP시스템 소개
+                </h1>
+                <p class="lead text-muted">
+                    Krishnamurti Paddhati (KP) 점성술 시스템에 대해 알아보세요.
+                </p>
+            </div>
+
+            <!-- What is KP System -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-star"></i> KP시스템이란?
+                    </h3>
+                    <p class="card-text">
+                        Krishnamurti Paddhati (KP)는 인도의 유명한 점성술사 K.S. Krishnamurti가 개발한
+                        정밀한 점성술 시스템입니다. 이 시스템은 전통적인 베다 점성술을 기반으로 하되,
+                        더욱 정확하고 실용적인 예측을 위해 개선되었습니다.
+                    </p>
+                    <p class="card-text">
+                        KP시스템의 주요 특징:
+                    </p>
+                    <ul>
+                        <li><strong>정밀한 계산:</strong> 천문학적 정확성을 바탕으로 한 계산</li>
+                        <li><strong>Sub Lords:</strong> 행성의 세분화된 영향력 분석</li>
+                        <li><strong>시간 예측:</strong> 정확한 시간 예측을 위한 특별한 기법</li>
+                        <li><strong>실용성:</strong> 일상생활에 적용 가능한 해석</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- House Systems -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-home"></i> 하우스 시스템
+                    </h3>
+
+                    <h5>Placidus 시스템</h5>
+                    <p>
+                        가장 널리 사용되는 하우스 시스템으로, 지구의 자전축을 기준으로 하늘을 12등분합니다.
+                        각 하우스는 30도가 아닌 가변적인 크기를 가지며, 위도에 따라 크기가 달라집니다.
+                    </p>
+
+                    <h5>Equal House 시스템</h5>
+                    <p>
+                        Ascendant(상승점)부터 시작하여 각 하우스를 정확히 30도씩 나누는 시스템입니다.
+                        계산이 간단하고 이해하기 쉬운 장점이 있습니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Ayanamsa -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-compass"></i> 아야남샤 (Ayanamsa)
+                    </h3>
+                    <p class="card-text">
+                        아야남샤는 열대 황도대와 시데럴 황도대 사이의 차이를 나타내는 각도입니다.
+                        지구의 세차운동으로 인해 발생하며, 점성술에서 매우 중요한 요소입니다.
+                    </p>
+
+                    <h5>라히리 (Lahiri) 아야남샤</h5>
+                    <p>
+                        인도 정부에서 공식적으로 채택한 아야남샤로, 가장 널리 사용됩니다.
+                        1956년에 Lahiri가 제안한 것으로, 현재 인도에서 표준으로 사용됩니다.
+                    </p>
+
+                    <h5>KP New 아야남샤</h5>
+                    <p>
+                        KP시스템에서 사용하는 특별한 아야남샤로, 더욱 정밀한 계산을 위해 개발되었습니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- House Meanings -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-list"></i> 12하우스의 의미
+                    </h3>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>개인적 영역 (1-6번 하우스)</h5>
+                            <ul>
+                                <li><strong>1번 하우스:</strong> 자기, 외모, 성격, 건강</li>
+                                <li><strong>2번 하우스:</strong> 재산, 가족, 음식, 말</li>
+                                <li><strong>3번 하우스:</strong> 형제자매, 통신, 여행, 용기</li>
+                                <li><strong>4번 하우스:</strong> 집, 부모, 부동산, 마음의 평화</li>
+                                <li><strong>5번 하우스:</strong> 자녀, 교육, 창의성, 사랑</li>
+                                <li><strong>6번 하우스:</strong> 질병, 적, 서비스, 직업</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>대인관계 영역 (7-12번 하우스)</h5>
+                            <ul>
+                                <li><strong>7번 하우스:</strong> 배우자, 파트너십, 결혼</li>
+                                <li><strong>8번 하우스:</strong> 죽음, 변형, 비밀, 타인의 돈</li>
+                                <li><strong>9번 하우스:</strong> 종교, 철학, 법, 장거리 여행</li>
+                                <li><strong>10번 하우스:</strong> 직업, 명성, 사회적 지위</li>
+                                <li><strong>11번 하우스:</strong> 소망, 친구, 이익, 수입</li>
+                                <li><strong>12번 하우스:</strong> 손실, 은둔, 영적 해방, 해외</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Details -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-cogs"></i> 기술적 세부사항
+                    </h3>
+
+                    <h5>사용된 라이브러리</h5>
+                    <ul>
+                        <li><strong>Astropy:</strong> 천문학적 계산을 위한 Python 라이브러리</li>
+                        <li><strong>Pytz:</strong> 시간대 처리</li>
+                        <li><strong>NumPy:</strong> 수치 계산</li>
+                        <li><strong>Flask:</strong> 웹 애플리케이션 프레임워크</li>
+                    </ul>
+
+                    <h5>계산 정확도</h5>
+                    <p>
+                        이 애플리케이션은 다음과 같은 정밀한 계산을 수행합니다:
+                    </p>
+                    <ul>
+                        <li>Julian Day Number 계산</li>
+                        <li>Local Sidereal Time (LST) 계산</li>
+                        <li>Obliquity of Ecliptic 계산</li>
+                        <li>House Cusps 계산 (Placidus/Equal)</li>
+                        <li>Ayanamsa 적용</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Usage Guide -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-book"></i> 사용 가이드
+                    </h3>
+
+                    <h5>기본 정보 입력</h5>
+                    <ol>
+                        <li><strong>이름:</strong> 차트 소유자의 이름을 입력하세요</li>
+                        <li><strong>생년월일:</strong> 정확한 출생 날짜와 시간을 입력하세요</li>
+                        <li><strong>시간대:</strong> 출생지의 시간대를 선택하세요</li>
+                        <li><strong>위도/경도:</strong> 출생지의 정확한 좌표를 입력하세요</li>
+                        <li><strong>아야남샤:</strong> 라히리 또는 KP New 중 선택하세요</li>
+                        <li><strong>하우스 시스템:</strong> Placidus 또는 Equal House 중 선택하세요</li>
+                    </ol>
+
+                    <h5>결과 해석</h5>
+                    <p>
+                        생성된 차트에서 각 하우스의 위치와 의미를 확인할 수 있습니다.
+                        특히 1번, 4번, 7번, 10번 하우스는 각도(Angular) 하우스로
+                        가장 중요한 의미를 가집니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-exclamation-triangle"></i> 면책 조항
+                    </h3>
+                    <p class="card-text">
+                        이 애플리케이션은 교육 및 연구 목적으로 제공됩니다.
+                        점성술적 해석은 참고용이며, 중요한 인생 결정에는 전문가의 조언을 구하시기 바랍니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Back to Home -->
+            <div class="text-center mt-4">
+                <a href="/" class="btn btn-primary btn-lg">
+                    <i class="fas fa-home"></i> 홈으로 돌아가기
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

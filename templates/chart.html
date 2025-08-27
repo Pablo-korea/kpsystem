@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block title %}{{ chart_data.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">{{ chart_data.name }}</h3>
+                    <div>
+                        <a href="/" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> 돌아가기
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- 오류 메시지 표시 -->
+                    {% if error_message %}
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {{ error_message }}
+                    </div>
+                    {% endif %}
+
+                    <!-- 하우스 각도 -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>하우스 각도</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>하우스</th>
+                                            <th>각도</th>
+                                            <th>사인로드</th>
+                                            <th>낙샤트라로드</th>
+                                            <th>서브로드</th>
+                                            <th>의미</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for house_num in range(1, 13) %}
+                                        <tr>
+                                            <td><strong>{{ house_num }}하우스</strong></td>
+                                            <td>{{ chart_data.house_angles.get(house_num|string, '-') }}</td>
+                                            <td><span class="badge bg-primary">{{ house_lords.get(house_num|string,
+                                                    {}).get('sign_lord', '-') }}</span></td>
+                                            <td><span class="badge bg-success">{{ house_lords.get(house_num|string,
+                                                    {}).get('nakshatra_lord', '-') }}</span></td>
+                                            <td><span class="badge bg-warning">{{ house_lords.get(house_num|string,
+                                                    {}).get('sub_lord', '-') }}</span></td>
+                                            <td>{{ get_house_meaning(house_num) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 행성 각도 -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>행성 각도</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>행성</th>
+                                            <th>각도</th>
+                                            <th>사인로드</th>
+                                            <th>낙샤트라로드</th>
+                                            <th>서브로드</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% set planet_names = {
+                                        'sun': '태양',
+                                        'moon': '달',
+                                        'mercury': '수성',
+                                        'venus': '금성',
+                                        'mars': '화성',
+                                        'jupiter': '목성',
+                                        'saturn': '토성',
+                                        'rahu': '라후',
+                                        'ketu': '케투'
+                                        } %}
+                                        {% for planet, name in planet_names.items() %}
+                                        <tr>
+                                            <td><strong>{{ name }}</strong></td>
+                                            <td>{{ chart_data.planet_angles.get(planet, '-') }}</td>
+                                            <td><span class="badge bg-primary">{{ planet_lords.get(planet,
+                                                    {}).get('sign_lord', '-') }}</span></td>
+                                            <td><span class="badge bg-success">{{ planet_lords.get(planet,
+                                                    {}).get('nakshatra_lord', '-') }}</span></td>
+                                            <td><span class="badge bg-warning">{{ planet_lords.get(planet,
+                                                    {}).get('sub_lord', '-') }}</span></td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 하우스별 행성 -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>하우스별 행성 배치</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>하우스</th>
+                                            <th>행성</th>
+                                            <th>의미</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for house_num in range(1, 13) %}
+                                        <tr>
+                                            <td><strong>{{ house_num }}하우스</strong></td>
+                                            <td>
+                                                {% set planets = chart_data.house_planets.get(house_num|string, '') %}
+                                                {% if planets %}
+                                                <span class="badge bg-primary">{{ planets }}</span>
+                                                {% else %}
+                                                <span class="text-muted">-</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ get_house_meaning(house_num) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KP 시그니피케이터 -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>KP 하우스 시그니피케이터</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>하우스</th>
+                                            <th>D<br />(하우스 행성이 낙샤트라로드에 있는 행성)</th>
+                                            <th>C<br />(하우스 행성)</th>
+                                            <th>B<br />(사인로드가 낙샤트라로드에 있는 행성)</th>
+                                            <th>A<br />(사인로드)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for house_num in range(1, 13) %}
+                                        <tr>
+                                            <td><strong>{{ house_num }}하우스</strong></td>
+                                            <td>{{ significators.get(house_num, {}).get('D', '-') }}</td>
+                                            <td>{{ significators.get(house_num, {}).get('C', '-') }}</td>
+                                            <td>{{ significators.get(house_num, {}).get('B', '-') }}</td>
+                                            <td>{{ significators.get(house_num, {}).get('A', '-') }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 행성 시그니피케이터 -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <h5>KP 행성 시그니피케이터</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>행성</th>
+                                            <th>D</th>
+                                            <th>C</th>
+                                            <th>B</th>
+                                            <th>A</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% set planet_order = ['태양', '달', '수성', '금성', '화성', '목성', '토성', '라후', '케투'] %}
+                                        {% for planet_name in planet_order %}
+                                        <tr>
+                                            <td><strong>{{ planet_name }}</strong></td>
+                                            <td>{{ planet_significators.get(planet_name, {}).get('D', [])|join(', ') if
+                                                planet_significators.get(planet_name, {}).get('D', []) else '-' }}</td>
+                                            <td>{{ planet_significators.get(planet_name, {}).get('C', [])|join(', ') if
+                                                planet_significators.get(planet_name, {}).get('C', []) else '-' }}</td>
+                                            <td>{{ planet_significators.get(planet_name, {}).get('B', [])|join(', ') if
+                                                planet_significators.get(planet_name, {}).get('B', []) else '-' }}</td>
+                                            <td>{{ planet_significators.get(planet_name, {}).get('A', [])|join(', ') if
+                                                planet_significators.get(planet_name, {}).get('A', []) else '-' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

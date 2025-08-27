@@ -1,0 +1,1098 @@
+{% extends "base.html" %}
+
+{% block title %}KP시스템 차트 생성기 - 홈{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/main">
+            <i class="fas fa-star"></i> KP시스템
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav ms-auto">
+                {% if user %}
+                <span class="navbar-text me-3">
+                    <i class="fas fa-user"></i> <span class="d-none d-md-inline">{{ user.name }} ({{ user.username
+                        }})</span><span class="d-md-none">{{ user.username }}</span>
+                </span>
+                <a class="nav-link" href="/logout">
+                    <i class="fas fa-sign-out-alt"></i> <span class="d-none d-md-inline">로그아웃</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+<div class="main-container">
+    <div class="row">
+        <div class="col-lg-12 mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-4 mb-md-5">
+                <h1 class="display-4 fw-bold text-primary mb-3">
+                    <i class="fas fa-star"></i> KP시스템 각도 입력
+                </h1>
+                <p class="lead text-muted d-none d-md-block">
+                    하우스 각도와 행성 위치를 직접 입력하여 KP 차트를 생성합니다.
+                </p>
+                <p class="text-muted d-md-none">
+                    하우스 각도와 행성 위치를 입력하여 KP 차트를 생성합니다.
+                </p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center mb-4">
+                        <i class="fas fa-chart-line"></i> KP시스템 각도 입력
+                    </h3>
+
+                    <form method="POST" action="/generate_chart" onsubmit="return submitChart(event)">
+
+                        <!-- Hidden Basic Information (for form processing) -->
+                        <div style="display: none;">
+                            <input type="text" name="name" id="name" value="테스트">
+                            <input type="datetime-local" name="birth_date" id="birth_date" value="2024-01-15T17:37">
+                            <select name="timezone" id="timezone">
+                                <option value="Asia/Seoul">한국 (Asia/Seoul)</option>
+                                <option value="Asia/Tokyo">일본 (Asia/Tokyo)</option>
+                                <option value="Asia/Shanghai">중국 (Asia/Shanghai)</option>
+                                <option value="Asia/Kolkata">인도 (Asia/Kolkata)</option>
+                                <option value="America/New_York">미국 동부 (America/New_York)</option>
+                                <option value="America/Los_Angeles">미국 서부 (America/Los_Angeles)</option>
+                                <option value="Europe/London">영국 (Europe/London)</option>
+                                <option value="Europe/Paris">프랑스 (Europe/Paris)</option>
+                            </select>
+                            <input type="number" name="latitude" id="latitude" value="37.38" step="0.0001">
+                            <input type="number" name="longitude" id="longitude" value="127.1188" step="0.0001">
+                            <select name="house_system" id="house_system">
+                                <option value="P">Placidus</option>
+                                <option value="E">Equal House</option>
+                            </select>
+                            <select name="ayanamsa" id="ayanamsa">
+                                <option value="LAHIRI">라히리 (Lahiri)</option>
+                                <option value="KP_NEW">KP New</option>
+                            </select>
+                        </div>
+
+                        <!-- 각도 입력 테이블들 -->
+                        <div class="row mt-4">
+                            <!-- 하우스별 각도 및 행성 입력 테이블 -->
+                            <div class="col-lg-7 col-md-12 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-table"></i> 하우스별 각도 및 행성 위치 (선택사항)
+                                        </h5>
+                                        <small class="text-muted">각도 형식: 271°59'43" 또는 271.9952778</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-hover table-sm"
+                                                style="max-width: 400px;">
+                                                <thead class="table-primary">
+                                                    <tr>
+                                                        <th style="text-align: center; width: 60px;">하우스</th>
+                                                        <th style="text-align: center; width: 130px;">각도</th>
+                                                        <th style="text-align: center;">행성</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">1</td>
+                                                        <td><input type="text" name="house_1_angle" id="house_1_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_1_planets"
+                                                                id="house_1_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">2</td>
+                                                        <td><input type="text" name="house_2_angle" id="house_2_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_2_planets"
+                                                                id="house_2_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">3</td>
+                                                        <td><input type="text" name="house_3_angle" id="house_3_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_3_planets"
+                                                                id="house_3_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">4</td>
+                                                        <td><input type="text" name="house_4_angle" id="house_4_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_4_planets"
+                                                                id="house_4_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">5</td>
+                                                        <td><input type="text" name="house_5_angle" id="house_5_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_5_planets"
+                                                                id="house_5_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">6</td>
+                                                        <td><input type="text" name="house_6_angle" id="house_6_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_6_planets"
+                                                                id="house_6_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">7</td>
+                                                        <td><input type="text" name="house_7_angle" id="house_7_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_7_planets"
+                                                                id="house_7_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">8</td>
+                                                        <td><input type="text" name="house_8_angle" id="house_8_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_8_planets"
+                                                                id="house_8_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">9</td>
+                                                        <td><input type="text" name="house_9_angle" id="house_9_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_9_planets"
+                                                                id="house_9_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">10</td>
+                                                        <td><input type="text" name="house_10_angle" id="house_10_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_10_planets"
+                                                                id="house_10_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">11</td>
+                                                        <td><input type="text" name="house_11_angle" id="house_11_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_11_planets"
+                                                                id="house_11_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">12</td>
+                                                        <td><input type="text" name="house_12_angle" id="house_12_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                        <td><input type="text" name="house_12_planets"
+                                                                id="house_12_planets"
+                                                                class="form-control form-control-sm"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 행성별 각도 입력 테이블 -->
+                            <div class="col-lg-5 col-md-12 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-star"></i> 행성별 각도 (선택사항)
+                                        </h5>
+                                        <small class="text-muted">각도 형식: 274°45'21" 또는 274.756</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-hover table-sm"
+                                                style="max-width: 300px;">
+                                                <thead class="table-success">
+                                                    <tr>
+                                                        <th style="text-align: center; width: 100px;">행성</th>
+                                                        <th style="text-align: center; width: 130px;">각도</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">태양 (Su)</td>
+                                                        <td><input type="text" name="sun_angle" id="sun_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">달 (Mo)</td>
+                                                        <td><input type="text" name="moon_angle" id="moon_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">수성 (Me)</td>
+                                                        <td><input type="text" name="mercury_angle" id="mercury_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">금성 (Ve)</td>
+                                                        <td><input type="text" name="venus_angle" id="venus_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">화성 (Ma)</td>
+                                                        <td><input type="text" name="mars_angle" id="mars_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">목성 (Ju)</td>
+                                                        <td><input type="text" name="jupiter_angle" id="jupiter_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">토성 (Sa)</td>
+                                                        <td><input type="text" name="saturn_angle" id="saturn_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">라후 (Ra)</td>
+                                                        <td><input type="text" name="rahu_angle" id="rahu_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td style="text-align: center; font-weight: bold;">케투 (Ke)</td>
+                                                        <td><input type="text" name="ketu_angle" id="ketu_angle"
+                                                                class="form-control form-control-sm"
+                                                                style="width: 120px;"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 데이터 불러오기 -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-database"></i> 데이터 불러오기
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3 mb-md-0">
+                                                <h6>회원 데이터 불러오기</h6>
+                                                <div class="input-group mb-3">
+                                                    <select class="form-select" id="sampleSelect">
+                                                        <option value="">회원 데이터 선택...</option>
+                                                    </select>
+                                                    <button class="btn btn-outline-primary" type="button"
+                                                        onclick="loadSelectedSample()">
+                                                        <i class="fas fa-download"></i> 선택한 데이터 로드
+                                                    </button>
+                                                </div>
+                                                <button class="btn btn-outline-danger" type="button"
+                                                    onclick="deleteSelectedData()">
+                                                    <i class="fas fa-trash"></i> 선택한 데이터 삭제
+                                                </button>
+                                            </div>
+                                            <div class="col-md-6 mb-3 mb-md-0">
+                                                <h6>현재 데이터 저장하기</h6>
+                                                <div class="input-group mb-3">
+                                                    <input type="text" class="form-control" id="saveName"
+                                                        placeholder="저장할 이름을 입력하세요">
+                                                    <button class="btn btn-outline-warning" type="button"
+                                                        onclick="saveCurrentData()">
+                                                        <i class="fas fa-save"></i> 저장
+                                                    </button>
+                                                </div>
+                                                <button class="btn btn-outline-secondary" type="button"
+                                                    onclick="clearAllFields()">
+                                                    <i class="fas fa-eraser"></i> 모든 필드 지우기
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="text-center mt-4">
+                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-center mb-3">
+                                <button type="button" class="btn btn-outline-warning" onclick="clearAllFields()">
+                                    <i class="fas fa-eraser"></i> <span class="d-none d-md-inline">모든 필드 </span>초기화
+                                </button>
+
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-lg w-100 w-md-auto">
+                                <i class="fas fa-chart-line"></i> 차트 생성
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Quick Info Cards -->
+            <div class="row mt-4 mt-md-5">
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-star fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">KP시스템</h5>
+                            <p class="card-text">Krishnamurti Paddhati는 인도에서 개발된 정밀한 점성술 시스템입니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-calculator fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">정확한 계산</h5>
+                            <p class="card-text">Astropy 라이브러리를 사용한 정밀한 천문학적 계산을 제공합니다.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-globe fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">전 세계 지원</h5>
+                            <p class="card-text">다양한 시간대와 위치에서 정확한 차트를 생성할 수 있습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular Cities -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-map"></i> 주요 도시 좌표
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><strong>서울:</strong> 37.5665°N, 126.9780°E</li>
+                                <li><strong>도쿄:</strong> 35.6762°N, 139.6503°E</li>
+                                <li><strong>뉴욕:</strong> 40.7128°N, 74.0060°W</li>
+                                <li><strong>런던:</strong> 51.5074°N, 0.1278°W</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><strong>파리:</strong> 48.8566°N, 2.3522°E</li>
+                                <li><strong>델리:</strong> 28.7041°N, 77.1025°E</li>
+                                <li><strong>상하이:</strong> 31.2304°N, 121.4737°E</li>
+                                <li><strong>로스앤젤레스:</strong> 34.0522°N, 118.2437°W</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 전역 변수
+    let currentMembers = {}; // 현재 사용자의 회원 데이터를 저장할 전역 변수
+
+    // 현재 시간을 기본값으로 설정
+    document.addEventListener('DOMContentLoaded', function () {
+        const now = new Date();
+        const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+            .toISOString()
+            .slice(0, 16);
+
+        const birthDateInput = document.getElementById('birth_date');
+        if (birthDateInput && !birthDateInput.value) {
+            birthDateInput.value = localDateTime;
+        }
+    });
+
+    // 위도/경도 입력 도우미
+    function setCoordinates(lat, lon) {
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lon;
+    }
+
+    // 페이지 로드 시 회원 데이터 목록 불러오기
+    window.onload = function () {
+        loadMemberList();
+
+        // 삭제 함수 디버깅
+        console.log('=== 페이지 로드 완료 ===');
+        console.log('deleteSelectedData 함수 정의됨:', typeof deleteSelectedData === 'function');
+
+        // 삭제 버튼이 존재하는지 확인
+        setTimeout(() => {
+            const deleteButtons = document.querySelectorAll('[onclick*="deleteSelectedData"]');
+            console.log('삭제 버튼 개수:', deleteButtons.length);
+            deleteButtons.forEach((btn, index) => {
+                console.log(`삭제 버튼 ${index + 1}:`, btn);
+                console.log(`버튼 텍스트: "${btn.textContent.trim()}"`);
+                console.log(`onclick 속성: "${btn.getAttribute('onclick')}"`);
+            });
+
+            // sampleSelect 요소 확인
+            const sampleSelect = document.getElementById('sampleSelect');
+            console.log('sampleSelect 요소:', sampleSelect);
+            if (sampleSelect) {
+                console.log('sampleSelect 옵션 개수:', sampleSelect.options.length);
+            }
+        }, 1000);
+    };
+
+    // 회원 데이터 목록 불러오기
+    async function loadMemberList() {
+        try {
+            const response = await fetch('/api/members');
+            const data = await response.json();
+            const select = document.getElementById('sampleSelect');
+
+            console.log('회원 데이터 목록:', data);
+
+            // 전역 변수에 현재 회원 데이터 저장
+            currentMembers = data;
+            console.log('currentMembers 설정 완료:', currentMembers);
+
+            select.innerHTML = '<option value="">회원 데이터 선택...</option>';
+
+            // data는 이제 {chart_name: chart_data} 구조 (사용자별로 이미 필터링됨)
+            console.log('데이터 구조 확인:', data);
+            console.log('데이터 키들:', Object.keys(data));
+            console.log('데이터 타입:', typeof data);
+
+            // data가 비어있는지 확인
+            if (Object.keys(data).length === 0) {
+                const option = document.createElement('option');
+                option.value = "";
+                option.textContent = "사용 가능한 데이터가 없습니다";
+                select.appendChild(option);
+                return;
+            }
+
+            // 각 차트 이름을 드롭다운에 추가
+            Object.keys(data).forEach(chartName => {
+                const chartData = data[chartName];
+                console.log(`차트 ${chartName}의 데이터:`, chartData);
+
+                // chartData가 실제 차트 데이터인지 확인 (birth_date 필드가 있는지)
+                if (chartData && typeof chartData === 'object' && chartData.birth_date) {
+                    const option = document.createElement('option');
+                    option.value = chartName; // 차트 이름만 value로 사용
+                    option.textContent = chartName; // 차트 이름만 표시
+                    select.appendChild(option);
+                    console.log(`차트 옵션 추가됨: ${chartName}`);
+                } else {
+                    console.warn(`유효하지 않은 차트 데이터: ${chartName}`, chartData);
+                }
+            });
+        } catch (error) {
+            console.error('회원 데이터 목록 불러오기 실패:', error);
+        }
+    }
+
+    // 선택한 회원 데이터 불러오기
+    async function loadSelectedSample() {
+        const select = document.getElementById('sampleSelect');
+        const selectedValue = select.value;
+
+        console.log('선택된 회원 데이터:', selectedValue);
+
+        if (!selectedValue) {
+            alert('회원 데이터를 선택해주세요.');
+            return;
+        }
+
+        try {
+            // selectedValue는 이제 차트 이름만
+            const chartName = selectedValue;
+            console.log('=== 데이터 로드 시작 ===');
+            console.log('선택된 차트 이름:', chartName);
+
+            // 현재 사용자의 모든 데이터를 가져옴
+            const response = await fetch('/api/members');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const memberData = await response.json();
+            console.log('API 응답 전체:', memberData);
+            console.log('API 응답 타입:', typeof memberData);
+            console.log('API 응답 키들:', Object.keys(memberData));
+
+            const chartData = memberData[chartName];
+            console.log('차트 이름으로 찾은 데이터:', chartData);
+            console.log('차트 데이터 타입:', typeof chartData);
+
+            if (!chartData) {
+                console.error(`차트 "${chartName}"을 찾을 수 없습니다.`);
+                console.log('사용 가능한 차트들:', Object.keys(memberData));
+                alert(`차트 "${chartName}"을 찾을 수 없습니다.`);
+                return;
+            }
+
+            console.log('fillFormWithData 호출 전 데이터:', chartData);
+            fillFormWithData(chartData);
+            console.log('=== 데이터 로드 완료 ===');
+        } catch (error) {
+            console.error('회원 데이터 불러오기 실패:', error);
+            alert('회원 데이터 불러오기에 실패했습니다.');
+        }
+    }
+
+    // 선택한 데이터 삭제
+    async function deleteSelectedData() {
+        console.log('=== 데이터 삭제 시작 ===');
+
+        const selectElement = document.getElementById('sampleSelect');
+        console.log('selectElement:', selectElement);
+
+        if (!selectElement) {
+            alert('회원 선택 요소를 찾을 수 없습니다.');
+            console.error('sampleSelect 요소를 찾을 수 없음');
+            return;
+        }
+
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        console.log('selectedOption:', selectedOption);
+        console.log('selectedIndex:', selectElement.selectedIndex);
+        console.log('options length:', selectElement.options.length);
+
+        if (!selectedOption || !selectedOption.value) {
+            alert('삭제할 데이터를 선택해주세요.');
+            console.log('선택된 옵션이 없음');
+            return;
+        }
+
+        const chartName = selectedOption.value;
+        console.log('삭제할 차트명:', chartName);
+
+        if (!confirm(`"${chartName}" 데이터를 정말로 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+            return;
+        }
+
+        try {
+            console.log('삭제 요청 전송 중...');
+            const response = await fetch(`/api/member/${encodeURIComponent(chartName)}`, {
+                method: 'DELETE'
+            });
+
+            console.log('서버 응답 상태:', response.status);
+            console.log('서버 응답:', response);
+
+            const result = await response.json();
+            console.log('서버 응답 데이터:', result);
+
+            if (result.success) {
+                alert(result.message);
+                console.log('삭제 성공, 목록 새로고침 중...');
+                // 회원 목록 새로고침
+                await loadMemberList();
+                // 폼 초기화
+                clearAllFields();
+                console.log('삭제 완료');
+            } else {
+                console.error('삭제 실패:', result);
+                alert('데이터 삭제에 실패했습니다: ' + (result.error || '알 수 없는 오류'));
+            }
+        } catch (error) {
+            console.error('데이터 삭제 실패:', error);
+            alert('데이터 삭제에 실패했습니다.');
+        }
+    }
+
+    // 현재 데이터 저장하기
+    async function saveCurrentData() {
+        const saveName = document.getElementById('saveName').value.trim();
+
+        if (!saveName) {
+            alert('저장할 이름을 입력해주세요.');
+            return;
+        }
+
+        // 현재 폼 데이터 수집
+        const formData = collectFormData();
+        formData.name = saveName;
+
+        // generate_chart 엔드포인트 형식에 맞게 데이터 변환
+        const chartData = new FormData();
+        chartData.append('member_id', saveName);
+        chartData.append('chart_name', saveName);
+        chartData.append('birth_date', formData.birth_date || '');
+        chartData.append('timezone', formData.timezone || 'Asia/Seoul');
+        chartData.append('latitude', formData.latitude || '37.38');
+        chartData.append('longitude', formData.longitude || '127.1188');
+        chartData.append('house_system', formData.house_system || 'P');
+        chartData.append('ayanamsa', formData.ayanamsa || 'LAHIRI');
+
+        // 하우스 각도 추가
+        for (let i = 1; i <= 12; i++) {
+            const houseAngle = document.getElementById(`house_${i}_angle`);
+            if (houseAngle && houseAngle.value) {
+                chartData.append(`house_${i}`, houseAngle.value);
+            }
+        }
+
+        // 행성 각도 추가
+        const planets = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'rahu', 'ketu'];
+        planets.forEach(planet => {
+            const planetAngle = document.getElementById(`${planet}_angle`);
+            if (planetAngle && planetAngle.value) {
+                chartData.append(planet, planetAngle.value);
+            }
+        });
+
+        // 하우스 행성 추가
+        for (let i = 1; i <= 12; i++) {
+            const housePlanets = document.getElementById(`house_${i}_planets`);
+            if (housePlanets) {
+                chartData.append(`house_${i}_planets`, housePlanets.value || '');
+            }
+        }
+
+        try {
+            const response = await fetch('/generate_chart', {
+                method: 'POST',
+                body: chartData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert(result.message);
+                document.getElementById('saveName').value = '';
+                // 저장된 데이터 목록 새로고침
+                loadMemberList();
+            } else {
+                alert('데이터 저장에 실패했습니다: ' + (result.error || '알 수 없는 오류'));
+            }
+        } catch (error) {
+            console.error('데이터 저장 실패:', error);
+            alert('데이터 저장에 실패했습니다.');
+        }
+    }
+
+    // 폼 데이터 수집
+    function collectFormData() {
+        const formData = {};
+
+        // 기본 정보
+        formData.name = document.getElementById('name').value;
+        formData.birth_date = document.getElementById('birth_date').value;
+        formData.timezone = document.getElementById('timezone').value;
+        formData.latitude = document.getElementById('latitude').value;
+        formData.longitude = document.getElementById('longitude').value;
+        formData.house_system = document.getElementById('house_system').value;
+        formData.ayanamsa = document.getElementById('ayanamsa').value;
+
+        // 하우스 각도
+        formData.house_angles = {};
+        for (let i = 1; i <= 12; i++) {
+            const angleInput = document.getElementById(`house_${i}_angle`);
+            if (angleInput) {
+                formData.house_angles[i] = angleInput.value;
+            }
+        }
+
+        // 하우스 행성
+        formData.house_planets = {};
+        for (let i = 1; i <= 12; i++) {
+            const planetInput = document.getElementById(`house_${i}_planets`);
+            if (planetInput) {
+                formData.house_planets[i] = planetInput.value;
+            }
+        }
+
+        // 행성 각도
+        const planets = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'rahu', 'ketu'];
+        formData.planet_angles = {};
+        planets.forEach(planet => {
+            const angleInput = document.getElementById(`${planet}_angle`);
+            if (angleInput) {
+                formData.planet_angles[planet] = angleInput.value;
+                console.log(`행성 ${planet} 각도: ${angleInput.value}`); // 디버깅 로그
+            }
+        });
+
+        // 디버깅 로그
+        console.log('=== 수집된 폼 데이터 ===');
+        console.log('행성 각도:', formData.planet_angles);
+        console.log('하우스 각도:', formData.house_angles);
+        console.log('하우스 행성:', formData.house_planets);
+        console.log('======================');
+
+        return formData;
+    }
+
+    // 폼에 데이터 채우기
+    function fillFormWithData(data) {
+        console.log('=== fillFormWithData 호출됨 ===');
+        console.log('받은 데이터:', data);
+
+        try {
+            // 기본 정보
+            if (data.name) {
+                const nameInput = document.getElementById('name');
+                if (nameInput) {
+                    nameInput.value = data.name;
+                    console.log('이름 설정:', data.name);
+                }
+            }
+            if (data.birth_date) {
+                const birthInput = document.getElementById('birth_date');
+                if (birthInput) {
+                    birthInput.value = data.birth_date;
+                    console.log('생년월일 설정:', data.birth_date);
+                }
+            }
+            if (data.timezone) {
+                const tzInput = document.getElementById('timezone');
+                if (tzInput) {
+                    tzInput.value = data.timezone;
+                    console.log('시간대 설정:', data.timezone);
+                }
+            }
+            if (data.latitude) {
+                const latInput = document.getElementById('latitude');
+                if (latInput) {
+                    latInput.value = data.latitude;
+                    console.log('위도 설정:', data.latitude);
+                }
+            }
+            if (data.longitude) {
+                const lonInput = document.getElementById('longitude');
+                if (lonInput) {
+                    lonInput.value = data.longitude;
+                    console.log('경도 설정:', data.longitude);
+                }
+            }
+            if (data.house_system) {
+                const hsInput = document.getElementById('house_system');
+                if (hsInput) {
+                    hsInput.value = data.house_system;
+                    console.log('하우스 시스템 설정:', data.house_system);
+                }
+            }
+            if (data.ayanamsa) {
+                const ayaInput = document.getElementById('ayanamsa');
+                if (ayaInput) {
+                    ayaInput.value = data.ayanamsa;
+                    console.log('아야남샤 설정:', data.ayanamsa);
+                }
+            }
+
+            // 하우스 각도
+            if (data.house_angles) {
+                console.log('하우스 각도 데이터:', data.house_angles);
+                console.log('하우스 각도 데이터 타입:', typeof data.house_angles);
+                console.log('하우스 각도 키들:', Object.keys(data.house_angles));
+
+                for (let i = 1; i <= 12; i++) {
+                    const angleInput = document.getElementById(`house_${i}_angle`);
+                    console.log(`하우스 ${i} 입력 필드:`, angleInput);
+
+                    // 정수 키와 문자열 키 모두 확인
+                    const angleValue = data.house_angles[i] || data.house_angles[i.toString()];
+                    console.log(`하우스 ${i} 각도 값:`, angleValue);
+
+                    if (angleInput && angleValue) {
+                        angleInput.value = angleValue;
+                        console.log(`하우스 ${i} 각도 설정 완료:`, angleValue);
+                    } else {
+                        if (!angleInput) console.warn(`하우스 ${i} 입력 필드를 찾을 수 없음`);
+                        if (!angleValue) console.warn(`하우스 ${i} 각도 값이 없음`);
+                    }
+                }
+            } else {
+                console.warn('하우스 각도 데이터가 없습니다.');
+            }
+
+            // 하우스 행성
+            if (data.house_planets) {
+                console.log('하우스 행성 데이터:', data.house_planets);
+                for (let i = 1; i <= 12; i++) {
+                    const planetInput = document.getElementById(`house_${i}_planets`);
+                    // 정수 키와 문자열 키 모두 확인
+                    const planetValue = data.house_planets[i] || data.house_planets[i.toString()];
+                    if (planetInput && planetValue) {
+                        planetInput.value = planetValue;
+                        console.log(`하우스 ${i} 행성 설정:`, planetValue);
+                    }
+                }
+            }
+
+            // 행성 각도
+            if (data.planet_angles) {
+                console.log('행성 각도 데이터:', data.planet_angles);
+                const planets = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'rahu', 'ketu'];
+                planets.forEach(planet => {
+                    const angleInput = document.getElementById(`${planet}_angle`);
+                    if (angleInput && data.planet_angles[planet]) {
+                        angleInput.value = data.planet_angles[planet];
+                        console.log(`${planet} 각도 설정:`, data.planet_angles[planet]);
+                    }
+                });
+            }
+
+            console.log('=== fillFormWithData 완료 ===');
+            alert('데이터가 성공적으로 불러와졌습니다!');
+
+        } catch (error) {
+            console.error('fillFormWithData 오류:', error);
+            alert('데이터 불러오기 중 오류가 발생했습니다: ' + error.message);
+        }
+    }
+
+    // 폼 제출 전 데이터 준비
+    function prepareFormData() {
+        console.log('=== 폼 제출 준비 시작 ===');
+
+        // 기본 정보 필드에 기본값 설정
+        const nameInput = document.getElementById('name');
+        const birthDateInput = document.getElementById('birth_date');
+        const timezoneInput = document.getElementById('timezone');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+        const houseSystemInput = document.getElementById('house_system');
+        const ayanamsaInput = document.getElementById('ayanamsa');
+
+        if (!nameInput.value) nameInput.value = '테스트';
+        if (!birthDateInput.value) {
+            const now = new Date();
+            const localDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16);
+            birthDateInput.value = localDateTime;
+        }
+        if (!timezoneInput.value) timezoneInput.value = 'Asia/Seoul';
+        if (!latitudeInput.value) latitudeInput.value = '37.38';
+        if (!longitudeInput.value) longitudeInput.value = '127.1188';
+        if (!houseSystemInput.value) houseSystemInput.value = 'P';
+        if (!ayanamsaInput.value) ayanamsaInput.value = 'LAHIRI';
+
+        console.log('기본 정보 설정 완료');
+
+        // 폼 데이터 수집
+        const formData = collectFormData();
+        console.log('수집된 폼 데이터:', formData);
+
+        // 하우스 각도나 행성 각도 중 하나라도 입력되었는지 확인
+        const hasHouseAngles = Object.values(formData.house_angles).some(angle => angle.trim() !== '');
+        const hasPlanetAngles = Object.values(formData.planet_angles).some(angle => angle.trim() !== '');
+
+        console.log('하우스 각도 체크:', hasHouseAngles);
+        console.log('행성 각도 체크:', hasPlanetAngles);
+        console.log('하우스 각도 데이터:', formData.house_angles);
+        console.log('행성 각도 데이터:', formData.planet_angles);
+
+        if (!hasHouseAngles && !hasPlanetAngles) {
+            alert('하우스 각도 또는 행성 각도를 하나 이상 입력해주세요.');
+            console.log('유효성 검사 실패: 각도 데이터 없음');
+            return false;
+        }
+
+        console.log('폼 유효성 검사 통과');
+        console.log('=== 폼 제출 준비 완료 ===');
+
+        return true;
+    }
+
+
+
+    // AJAX로 차트 생성 제출
+    async function submitChart(event) {
+        event.preventDefault(); // 기본 폼 제출 방지
+
+        console.log('=== 차트 생성 제출 시작 ===');
+
+        // 폼 데이터 준비
+        console.log('prepareFormData 호출 시작');
+        const prepareResult = prepareFormData();
+        console.log('prepareFormData 결과:', prepareResult);
+
+        if (!prepareResult) {
+            console.log('폼 데이터 준비 실패');
+            alert('하우스 각도 또는 행성 각도를 입력해주세요.');
+            return false;
+        }
+        console.log('폼 데이터 준비 성공');
+
+        // 차트명 중복 검사 (임시 비활성화)
+        console.log('=== 차트명 중복 검사 시작 ===');
+        const chartName = document.getElementById('name').value.trim();
+        console.log('차트명:', chartName);
+        console.log('currentMembers:', currentMembers);
+
+        // 임시로 중복 검사 비활성화
+        /*
+        if (chartName && currentMembers && currentMembers[chartName]) {
+            alert(`차트명 중복 확인: "${chartName}" 이미 존재`);
+            if (!confirm(`"${chartName}" 차트가 이미 존재합니다.\n\n기존 데이터를 덮어쓰시겠습니까?`)) {
+                alert('차트 생성 취소됨');
+                return false;
+            }
+        }
+        */
+        console.log('차트명 중복 검사 통과');
+
+        try {
+            console.log('=== try 블록 시작 ===');
+
+            // 폼 데이터 수집
+            console.log('폼 데이터 수집 시작');
+            const form = event.target;
+            console.log('폼 객체:', form);
+
+            const formData = new FormData(form);
+            console.log('FormData 생성 완료');
+
+            // member_id와 chart_name 추가 (필수 필드)
+            const memberId = document.getElementById('name').value.trim() || 'member_' + Date.now();
+            const chartName = document.getElementById('name').value.trim() || 'chart_' + Date.now();
+
+            console.log('memberId:', memberId);
+            console.log('chartName:', chartName);
+
+            formData.append('member_id', memberId);
+            formData.append('chart_name', chartName);
+
+            console.log('전송할 데이터:', Object.fromEntries(formData));
+
+            // 로딩 상태 표시
+            const submitButton = form.querySelector('button[type="submit"]');
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 생성 중...';
+            submitButton.disabled = true;
+
+            // AJAX 요청
+            console.log('=== AJAX 요청 시작 ===');
+
+            let result;
+            try {
+                const response = await fetch('/generate_chart', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                console.log('서버 응답 상태:', response.status);
+                console.log('서버 응답 객체:', response);
+
+                result = await response.json();
+                console.log('서버 응답 데이터:', result);
+            } catch (fetchError) {
+                console.error('=== Fetch 오류 발생 ===');
+                console.error('Fetch 오류:', fetchError);
+                alert(`Fetch 오류: ${fetchError.message}`);
+                throw fetchError; // 상위 catch로 전달
+            }
+
+            if (result.success) {
+                // 업데이트 여부에 따라 다른 메시지 표시
+                if (result.is_update) {
+                    if (confirm(result.message + '\n\n차트 페이지로 이동하시겠습니까?')) {
+                        window.location.href = result.redirect_url;
+                    } else {
+                        // 회원 목록 새로고침
+                        loadMemberList();
+                    }
+                } else {
+                    alert(result.message);
+                    // 성공 시 차트 페이지로 리디렉션
+                    if (result.redirect_url) {
+                        window.location.href = result.redirect_url;
+                    }
+                }
+            } else {
+                alert('오류: ' + (result.error || '알 수 없는 오류가 발생했습니다.'));
+            }
+
+            // 로딩 상태 해제
+            submitButton.innerHTML = originalText;
+            submitButton.disabled = false;
+
+        } catch (error) {
+            console.error('=== 차트 생성 중 오류 발생 ===');
+            console.error('오류 타입:', error.name);
+            console.error('오류 메시지:', error.message);
+            console.error('오류 스택:', error.stack);
+            alert(`차트 생성 중 오류 발생!\n타입: ${error.name}\n메시지: ${error.message}`);
+
+            // 로딩 상태 해제
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            submitButton.innerHTML = '<i class="fas fa-chart-line"></i> 차트 생성';
+            submitButton.disabled = false;
+        }
+
+        return false;
+    }
+
+    // 모든 필드 지우기
+    function clearAllFields() {
+        if (confirm('모든 입력 필드를 지우시겠습니까?')) {
+            // 기본 정보 지우기
+            document.getElementById('name').value = '';
+            document.getElementById('birth_date').value = '';
+            document.getElementById('latitude').value = '';
+            document.getElementById('longitude').value = '';
+
+            // 하우스 각도 지우기
+            for (let i = 1; i <= 12; i++) {
+                const angleInput = document.getElementById(`house_${i}_angle`);
+                if (angleInput) angleInput.value = '';
+            }
+
+            // 하우스 행성 지우기
+            for (let i = 1; i <= 12; i++) {
+                const planetInput = document.getElementById(`house_${i}_planets`);
+                if (planetInput) planetInput.value = '';
+            }
+
+            // 행성 각도 지우기
+            const planets = ['sun', 'moon', 'mercury', 'venus', 'mars', 'jupiter', 'saturn', 'rahu', 'ketu'];
+            planets.forEach(planet => {
+                const angleInput = document.getElementById(`${planet}_angle`);
+                if (angleInput) angleInput.value = '';
+            });
+
+            // 저장 이름 지우기
+            document.getElementById('saveName').value = '';
+        }
+    }
+</script>
+{% endblock %}
